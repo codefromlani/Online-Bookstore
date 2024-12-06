@@ -32,7 +32,7 @@ class Book(Base):
     author_id = Column(Integer, ForeignKey("authors.id"))
     category_id = Column(Integer, ForeignKey("categories.id"))
     title = Column(String, nullable=False,index=True)
-    price = Column(Float)
+    price = Column(Float, nullable=False)
     publication_date = Column(Date, nullable=False)
     description = Column(Text)
 
