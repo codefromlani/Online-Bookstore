@@ -1,4 +1,4 @@
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Response
 from sqlalchemy.orm import Session
 from typing import List, Optional
 import models
@@ -15,14 +15,22 @@ def create_book(book: schemas.BookCreate, db: Session) -> models.Book:
             status_code=status.HTTP_409_CONFLICT,
             detail="This author already has a book with the same title"
         )
-    
+    # Fetch categories from the database using category_ids
+    categories = db.query(models.Category).filter(models.Category.id in (book.category_ids))
+    # Make sure all categories exist
+    if categories != len(book.category_ids):
+         raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="One or more categories not found"
+        )
+    # Create the new book, associating it with the categories
     new_book = models.Book(
         title=book.title,
         price=book.price,
         publication_date=book.publication_date,
         description=book.description,
         author_id=book.author_id,
-        category_id=book.category_id
+        categories=categories # Associate the categories with the new book
     )
     db.add(new_book)
     db.commit()
@@ -37,7 +45,7 @@ def get_book(db: Session, skip: int = 0, limit: int = 10) -> List[models.Book]:
 
 def get_book_by_id(book_id: int, db: Session) -> models.Book:
     """Retrieve book by id"""
-    db_book = db.query(models.Book).filter(models.Book.id == book_id).first()
+    db_book = db.query(models.Book).get(book_id)
     if db_book is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -76,3 +84,4 @@ def delete_book(book_id: int, db: Session) -> None:
             )
     db.delete(db_book)
     db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
