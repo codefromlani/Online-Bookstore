@@ -9,6 +9,10 @@ import schemas
 
 app = FastAPI(title="Online-Bookstore")
 
+@app.get("/")
+def home():
+    return {"message": "Hello there! Welcome to my Online-Bookstore"}
+
 @app.post("/token", response_model=schemas.Token)
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
