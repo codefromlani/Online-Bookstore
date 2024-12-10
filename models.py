@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, Float, Date, Enum
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, Float, Date, Enum, DateTime
 from database import Base
 import enum
 from datetime import datetime, date
@@ -8,14 +8,14 @@ from sqlalchemy.orm import relationship
 class Author(Base):
     __tablename__ = "authors"
     id = Column(Integer, primary_key=True, index=True)
-    first_name = Column(String, nullable=False)
-    last_name = Column(String, nullable=False)
+    first_name = Column(String, nullable=False, index=True)
+    last_name = Column(String, nullable=False, index=True)
     biography = Column(Text)
 
     books = relationship("Book", back_populates="author")
 
     def __repr__(self):
-        return f"<Author(id={self.id}, first_name{self.first_name}, last_name{self.last_name})>"
+        return f"<Author(id={self.id}, first_name={self.first_name}, last_name={self.last_name})>"
 
 class Category(Base):
     __tablename__ = "categories"
@@ -30,7 +30,7 @@ class Book(Base):
     __tablename__ = "books"
     id = Column(Integer, primary_key=True, index=True)
     author_id = Column(Integer, ForeignKey("authors.id"))
-    category_id = Column(Integer, ForeignKey("categories.id"))
+    # category_id = Column(Integer, ForeignKey("categories.id"))
     title = Column(String, nullable=False,index=True)
     price = Column(Float, nullable=False)
     publication_date = Column(Date, nullable=False)
@@ -45,8 +45,8 @@ class Book(Base):
 
 class BookCategory(Base): #Junction table
     __tablename__ = "book_categories"
-    book_id = Column(Integer, ForeignKey("books.id"))
-    category_id = Column(Integer, ForeignKey("categories.id"))
+    book_id = Column(Integer, ForeignKey("books.id"), primary_key=True)
+    category_id = Column(Integer, ForeignKey("categories.id"), primary_key=True)
 
     category = relationship("Category", back_populates="books")
     book = relationship("Book", back_populates="categories")
@@ -62,7 +62,7 @@ class User(Base):
     last_name = Column(String)
     address = Column(String)
     phone_number = Column(String)
-    date_joined = Column(datetime, default=datetime.utcnow)
+    date_joined = Column(DateTime, default=datetime.utcnow)
 
     orders = relationship("Order", back_populates="user")
     reviews = relationship("Review", back_populates="user")
@@ -79,7 +79,7 @@ class Order(Base):
     __tablename__ = "orders"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
-    order_date = Column(datetime, default=datetime.utcnow)
+    order_date = Column(DateTime, default=datetime.utcnow)
     total_amount = Column(Float, nullable=False)
     status = Column(Enum(OrderEnum), nullable=False, index=True)
 
