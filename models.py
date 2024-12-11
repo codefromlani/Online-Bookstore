@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, Float, Date, Enum, DateTime
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, Float, Date, Enum, DateTime, Boolean
 from database import Base
 import enum
 from datetime import datetime, date
@@ -63,6 +63,7 @@ class User(Base):
     address = Column(String)
     phone_number = Column(String)
     date_joined = Column(DateTime, default=datetime.utcnow)
+    is_admin = Column(Boolean, default=False)
 
     orders = relationship("Order", back_populates="user")
     reviews = relationship("Review", back_populates="user")
