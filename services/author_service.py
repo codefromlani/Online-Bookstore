@@ -1,8 +1,9 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from typing import Optional
+from typing import Optional, List
 import models
 import schemas
+import auth
 
 
 def create_author(author: schemas.AuthorCreate, db: Session) -> models.Author:
@@ -25,6 +26,10 @@ def create_author(author: schemas.AuthorCreate, db: Session) -> models.Author:
     db.commit()
     db.refresh(new_author)
     return new_author
+
+def get_authors(db: Session, skip: int = 0, limit: int = 5) -> List[models.Author]:
+    """Get a list of all Authors"""
+    return db.query(models.Author).offset(skip).limit(limit).all()
 
 def get_author_by_id(author_id: int, db: Session) -> models.Author:
     """Get an author by ID from the database"""
