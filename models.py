@@ -4,7 +4,6 @@ import enum
 from datetime import datetime, date
 from sqlalchemy.orm import relationship
 
-
 class Author(Base):
     __tablename__ = "authors"
     id = Column(Integer, primary_key=True, index=True)
@@ -12,6 +11,7 @@ class Author(Base):
     last_name = Column(String, nullable=False, index=True)
     biography = Column(Text)
 
+    # One-to-many relationship with Book
     books = relationship("Book", back_populates="author")
 
     def __repr__(self):
@@ -23,7 +23,7 @@ class Category(Base):
     name = Column(String, nullable=False)
 
     # Many-to-many relationship with Book via BookCategory junction table
-    books = relationship("Book", secondary="book_categories", back_populates="categories")
+    # books = relationship("Book", secondary="book_categories", back_populates="categories")
 
 
 class Book(Base):
@@ -36,20 +36,31 @@ class Book(Base):
     publication_date = Column(Date, nullable=False)
     description = Column(Text)
 
+    # One-to-many relationship with Author
     author = relationship("Author", back_populates="books")
-    # Many-to-many relation via BookCategory
-    categories = relationship("Category", secondary="book_categories", back_populates="books")  
+
+    # Many-to-many relationship with Category via BookCategory
+    # categories = relationship("Category", secondary="book_categories", back_populates="books")  
+
+    # One-to-many relationship with Review
     reviews = relationship("Review", back_populates="book")
+
+    # One-to-many relationship with OrderItem
     order_items = relationship("OrderItem", back_populates="book")
 
 
+# Junction table for many-to-many relationship between Book and Category
 class BookCategory(Base): #Junction table
     __tablename__ = "book_categories"
     book_id = Column(Integer, ForeignKey("books.id"), primary_key=True)
     category_id = Column(Integer, ForeignKey("categories.id"), primary_key=True)
 
-    category = relationship("Category", back_populates="books")
-    book = relationship("Book", back_populates="categories")
+     # Relationships to Category and Book
+    # category = relationship("Category", back_populates="books")
+    # book = relationship("Book", back_populates="categories")
+
+    category = relationship("Category", backref="book_categories")
+    book = relationship("Book", backref="book_categories")
 
 
 class User(Base):
@@ -65,10 +76,14 @@ class User(Base):
     date_joined = Column(DateTime, default=datetime.utcnow)
     is_admin = Column(Boolean, default=False)
 
+    # One-to-many relationship with Order
     orders = relationship("Order", back_populates="user")
+
+    # One-to-many relationship with Review
     reviews = relationship("Review", back_populates="user")
 
 
+# Enum for Order status
 class OrderEnum(enum.Enum):
     PENDING = "pending"
     SHIPPED = "shipped"
@@ -84,7 +99,10 @@ class Order(Base):
     total_amount = Column(Float, nullable=False)
     status = Column(Enum(OrderEnum), nullable=False, index=True)
 
+    # Many-to-one relationship with User
     user = relationship("User", back_populates="orders")
+
+    # One-to-many relationship with OrderItem
     order_items = relationship("OrderItem", back_populates="order")
 
 
@@ -96,7 +114,10 @@ class OrderItem(Base):
     quantity = Column(Integer, nullable=False)
     price_at_time = Column(Float, nullable=False)
 
+    # Many-to-one relationship with Order
     order = relationship("Order", back_populates="order_items")
+
+    # Many-to-one relationship with Book
     book = relationship("Book", back_populates="order_items")
 
 class Review(Base):
@@ -108,5 +129,8 @@ class Review(Base):
     review_text = Column(String)
     review_date = Column(Date, default=date.today)
 
+    # Many-to-one relationship with Book
     book = relationship("Book", back_populates="reviews")
+
+     # Many-to-one relationship with User
     user = relationship("User", back_populates="reviews")
