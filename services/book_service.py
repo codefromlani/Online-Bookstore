@@ -6,6 +6,7 @@ import schemas
 
 def create_book(book: schemas.BookCreate, db: Session) -> models.Book:
     """Create a new book"""
+    # print(f"Category IDs: {book.category_ids}")
     db_book = db.query(models.Book).filter(
         models.Book.title == book.title,
         models.Book.author_id == book.author_id
@@ -16,9 +17,10 @@ def create_book(book: schemas.BookCreate, db: Session) -> models.Book:
             detail="This author already has a book with the same title"
         )
     # Fetch categories from the database using category_ids
-    categories = db.query(models.Category).filter(models.Category.id in (book.category_ids))
+    categories = db.query(models.Category).filter(
+         models.Category.id.in_ (book.category_ids)).all()
     # Make sure all categories exist
-    if categories != len(book.category_ids):
+    if len(categories) != len(book.category_ids):
          raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="One or more categories not found"
@@ -30,9 +32,16 @@ def create_book(book: schemas.BookCreate, db: Session) -> models.Book:
         publication_date=book.publication_date,
         description=book.description,
         author_id=book.author_id,
-        categories=categories # Associate the categories with the new book
+        # categories=categories # Associate the categories with the new book
     )
+
+    book_categories = [
+        models.BookCategory(book=new_book, category_id=cat_id) 
+        for cat_id in book.category_ids
+    ]
+
     db.add(new_book)
+    db.add_all(book_categories)
     db.commit()
     db.refresh(new_book)
 
