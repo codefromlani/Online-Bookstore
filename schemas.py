@@ -96,18 +96,19 @@ class OrderEnum(str, Enum):
     CANCELLED = "cancelled"
 
 
-class OrderCreate(BaseModel):
-    user_id: int
-    order_date: Optional[datetime] = datetime.utcnow() # Optional, defaults to current time if not provided
-    total_amount: float
-    status: OrderEnum
-
-
 class OrderItemCreate(BaseModel):
     order_id: int
     book_id: int
     quantity: int
     price_at_time: float
+
+
+class OrderCreate(BaseModel):
+    user_id: int
+    # order_date: Optional[datetime] = datetime.utcnow() # Optional, defaults to current time if not provided
+    total_amount: float
+    status: OrderEnum
+    order_items: List[OrderItemCreate]
 
 
 class OrderResponse(BaseModel):
@@ -128,7 +129,7 @@ class ReviewCreate(BaseModel):
     book_id: int
     rating: int
     review_text: str
-    review_date: Optional[date] = date.today()
+    # review_date: Optional[date] = date.today()
 
 
 class ReviewResponse(ReviewCreate):
