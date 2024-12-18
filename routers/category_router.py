@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from services import category_service
 from database import get_db
+from typing import List
 import schemas
 import models
 import auth
@@ -19,7 +20,7 @@ def create_category(
     ):
     return category_service.create_category(category=category, db=db)
 
-@router.get("/category/", response_model=schemas.CategoryResponse)
+@router.get("/category/", response_model=List[schemas.CategoryResponse])
 def get_categories(
     skip: int = 0, limit: int = 10, 
     db: Session = Depends(get_db)
