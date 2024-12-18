@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from database import get_db
+from typing import List
 import schemas
 import models
 import auth
@@ -19,7 +20,7 @@ def create_author(
     ):
     return author_service.create_author(author=author, db=db)
 
-@router.get("/author/", response_model=schemas.AuthorResponse)
+@router.get("/author/", response_model=List[schemas.AuthorResponse])
 def get_authors(
     skip: int = 0, limit: int = 5, 
     db: Session = Depends(get_db)
