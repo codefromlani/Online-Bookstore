@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from database import get_db
 from services import book_service
+from typing import List
 import schemas
 import models
 import auth
@@ -19,7 +20,7 @@ def create_book(
 ):
     return book_service.create_book(book=book, db=db)
 
-@router.get("/books/", response_model=schemas.BookResponse)
+@router.get("/books/", response_model=List[schemas.BookResponse])
 def get_books(
     skip: int = 0,
     limit: int = 10,

@@ -47,7 +47,7 @@ def create_book(book: schemas.BookCreate, db: Session) -> models.Book:
 
     return new_book
 
-def get_book(db: Session, skip: int = 0, limit: int = 10) -> List[models.Book]:
+def get_books(db: Session, skip: int = 0, limit: int = 10) -> List[models.Book]:
     """Retrieve books from the database"""
     db_book = db.query(models.Book).offset(skip).limit(limit).all()
     return db_book
@@ -91,6 +91,8 @@ def delete_book(book_id: int, db: Session) -> None:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=(f"Book with the id {book_id} is not found")
             )
+    db.query(models.BookCategory).filter(models.BookCategory.book_id == book_id).delete()
+
     db.delete(db_book)
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
