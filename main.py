@@ -1,13 +1,25 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from database import get_db
+from database import get_db, Base, engine
 from datetime import timedelta
+from routers import author_router, category_router, user_router, book_router, order_router, review_router
 import auth
 import schemas
 
 
+Base.metadata.create_all(bind=engine)
+
 app = FastAPI(title="Online-Bookstore")
+
+
+
+app.include_router(author_router.router)
+app.include_router(category_router.router)
+app.include_router(book_router.router)
+app.include_router(user_router.router)
+app.include_router(order_router.router)
+app.include_router(review_router.router)
 
 @app.get("/")
 def home():
