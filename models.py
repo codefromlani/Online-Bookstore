@@ -1,8 +1,9 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, Float, Date, Enum, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, Float, Date, DateTime, Boolean
 from database import Base
-import enum
+from enum import Enum
 from datetime import datetime, date
 from sqlalchemy.orm import relationship
+from sqlalchemy import Enum as SQLAlchemyEnum
 
 class Author(Base):
     __tablename__ = "authors"
@@ -84,8 +85,8 @@ class User(Base):
 
 
 # Enum for Order status
-class OrderEnum(enum.Enum):
-    PENDING = "pending"
+class OrderEnum(str, Enum):
+    PENDING = "PENDING"
     SHIPPED = "shipped"
     DELIVERED = "delivered"
     CANCELLED = "cancelled"
@@ -97,7 +98,7 @@ class Order(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     order_date = Column(DateTime, default=datetime.utcnow)
     total_amount = Column(Float, nullable=False)
-    status = Column(Enum(OrderEnum), nullable=False, index=True)
+    status = Column(SQLAlchemyEnum(OrderEnum), nullable=False, index=True)
 
     # Many-to-one relationship with User
     user = relationship("User", back_populates="orders")
