@@ -20,9 +20,9 @@ class BookCreate(BookBase):
 
 
 class BookUpdate(BookBase):
-    title: Optional[str]
-    price: Optional[float] 
-    publication_date: Optional[date]
+    title: Optional[str] = None
+    price: Optional[float] = None
+    publication_date: Optional[date] = None
 
 
 class BookResponse(BookBase):
@@ -38,14 +38,16 @@ class AuthorCreate(BaseModel):
         orm_mode = True
 
 
-class AuthorUpdate(AuthorCreate):
-    first_name: Optional[str]
-    last_name: Optional[str]
-    biography: Optional[str]
-
+class AuthorUpdate(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    biography: Optional[str] = None
 
 class AuthorResponse(AuthorCreate):
     id: int
+
+    class Config:  
+        orm_mode = True
 
    
 class CategoryCreate(BaseModel):
@@ -56,7 +58,7 @@ class CategoryCreate(BaseModel):
 
 
 class CategoryUpdate(CategoryCreate):
-    name: Optional[str]
+    name: Optional[str] = None
 
 
 class CategoryResponse(CategoryCreate):
@@ -90,7 +92,7 @@ class UserResponse(UserBase):
 
 
 class OrderEnum(str, Enum):
-    PENDING = "pending"
+    PENDING = "PENDING"
     SHIPPED = "shipped"
     DELIVERED = "delivered"
     CANCELLED = "cancelled"
@@ -106,8 +108,8 @@ class OrderItemCreate(BaseModel):
 class OrderCreate(BaseModel):
     user_id: int
     # order_date: Optional[datetime] = datetime.utcnow() # Optional, defaults to current time if not provided
-    total_amount: float
-    status: OrderEnum
+    total_amount: float = 0
+    status: OrderEnum 
     order_items: List[OrderItemCreate]
 
 
@@ -116,12 +118,14 @@ class OrderResponse(BaseModel):
     user_id: int 
     order_date: datetime
     total_amount: float
-    status: OrderEnum
+    status: OrderEnum 
     order_items: List[OrderItemCreate] = []
 
 
     class Config:
         orm_mode = True
+
+        use_enum_values = True 
 
 
 class ReviewCreate(BaseModel):
