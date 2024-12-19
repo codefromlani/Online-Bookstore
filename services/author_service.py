@@ -44,11 +44,11 @@ def update_author(author_id: int, updated_author: schemas.AuthorUpdate, db: Sess
     if db_author is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Author with ID {author_id} not found")
     
-    if updated_author.first_name:
+    if updated_author.first_name is not None:
         db_author.first_name=updated_author.first_name
-    if updated_author.last_name:
+    if updated_author.last_name is not None:
         db_author.last_name=updated_author.last_name
-    if updated_author.biography:
+    if updated_author.biography is not None:
         db_author.biography=updated_author.biography
 
     db.commit()
